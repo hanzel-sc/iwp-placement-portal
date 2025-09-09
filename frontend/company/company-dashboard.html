@@ -1,0 +1,84 @@
+<!-- frontend/company/company-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - Christ University Placement Portal</title>
+    <link rel="stylesheet" href="/frontend/css/company-styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="https://christuniversity.in/images/logo.png" alt="Christ University">
+                <div class="logo-text">Placement Portal</div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="company-dashboard.html">Dashboard</a></li>
+                    <li><a href="company-profile.html">Profile</a></li>
+                    <li><a href="create-job.html">Post Job</a></li>
+                    <li><a href="view-applications.html">Applications</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span id="companyName">Loading...</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Welcome to Christ University Placement Portal</h1>
+                <p class="card-subtitle">Company Dashboard - Manage your recruitment process</p>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalJobs">0</div>
+                <div class="stat-label">Active Job Postings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalApplications">0</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalHired">0</div>
+                <div class="stat-label">Students Hired</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Job Postings</h2>
+            </div>
+            <div id="recentJobs">
+                <div class="loading"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Applications</h2>
+            </div>
+            <div id="recentApplications">
+                <div class="loading"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            loadCompanyProfile();
+        });
+    </script>
+</body>
+</html>

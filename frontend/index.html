@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CHRIST University Placement Portal</title>
+  <link rel="stylesheet" href="css/landing.css"/>
+</head>
+<body>
+  <header>
+    <div class="top-nav">
+      <div class="logo-area">
+        <img src="https://christuniversity.in/images/logo.png" alt="Christ University"/>
+        <span class="site-title">Placement Cell</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Jobs</a></li>
+          <li><a href="#">Post Resume</a></li>
+          <li><a href="#">About us</a></li>
+          <li><button id="openModalBtn" class="btn-link">Login</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="landing-section">
+      <div class="info-left">
+        <h1>CHRIST UNIVERSITY PLACEMENT CELL</h1>
+        <p>CHRIST University’s Placement Portal connects students with recruiters, offering job listings, career support, and smooth campus placement coordination.</p>
+      </div>
+      <div class="form-card">
+        <div class="tabs">
+          <button class="tab-btn active" data-role="company">Company</button>
+          <button class="tab-btn" data-role="student">Candidate</button>
+          <button class="tab-btn" data-role="faculty">Faculty</button>
+        </div>
+        <div id="authForms">
+          <!-- Form content will be inserted by JS based on tab and mode (login/register) -->
+        </div>
+        <div class="switch-mode">
+          <span id="switchText">New here?</span>
+          <button id="toggleModeBtn">Register</button>
+        </div>
+        <div id="formAlert"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal for mobile -->
+  <div id="modalOverlay" class="modal-overlay" style="display:none">
+    <div class="modal-centered">
+      <button id="closeModalBtn" class="modal-close">×</button>
+      <!-- Reuse same form as desktop -->
+      <div class="modal-form-container"></div>
+    </div>
+  </div>
+
+  <script src="js/landing.js"></script>
+</body>
+</html>
