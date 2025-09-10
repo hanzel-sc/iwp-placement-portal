@@ -130,13 +130,14 @@ function attachFormHandler() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userType", currentRole);
         localStorage.setItem("userId", data.user.id);
-        // Redirect
+        
+        // FIXED: Updated redirect paths for Vercel deployment
         if (currentRole === "company") {
-          location.href = "/frontend/company/company-dashboard.html";
+          location.href = "/company/company-dashboard.html";
         } else if (currentRole === "student") {
-          location.href = "student-dashboard.html";
-        } else {
-          location.href = "faculty-dashboard.html";
+          location.href = "/student/student-dashboard.html";
+        } else if (currentRole === "faculty") {
+          location.href = "/faculty/faculty-dashboard.html";
         }
       } else {
         formAlert.className = 'success';
