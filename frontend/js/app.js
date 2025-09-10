@@ -45,9 +45,8 @@ function logout() {
     localStorage.removeItem('userType');
     localStorage.removeItem('userId');
     
-    // Use relative path for Vercel deployment
-    const basePath = getBasePath();
-    window.location.href = basePath + 'index.html';
+    // Navigate to index.html
+    window.location.href = '/index.html';
 }
 
 // API utility functions

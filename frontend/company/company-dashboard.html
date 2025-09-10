@@ -1,11 +1,10 @@
-<!-- frontend/company/company-dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Dashboard - Christ University Placement Portal</title>
-    <link rel="stylesheet" href="/frontend/css/company-styles.css">
+    <link rel="stylesheet" href="/css/company-styles.css">
 </head>
 <body>
     <header class="header">
@@ -30,15 +29,16 @@
             </div>
         </div>
     </header>
-
     <main class="main-content">
+        <div id="alertContainer"></div>
+        
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title">Welcome to Christ University Placement Portal</h1>
                 <p class="card-subtitle">Company Dashboard - Manage your recruitment process</p>
             </div>
         </div>
-
+        
         <div class="dashboard-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalJobs">0</div>
@@ -53,7 +53,7 @@
                 <div class="stat-label">Students Hired</div>
             </div>
         </div>
-
+        
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Recent Job Postings</h2>
@@ -62,7 +62,7 @@
                 <div class="loading"></div>
             </div>
         </div>
-
+        
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">Recent Applications</h2>
@@ -73,7 +73,15 @@
         </div>
     </main>
 
-    <script src="../js/app.js"></script>
+    <!-- Student Details Modal -->
+    <div id="studentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:8px; max-width:500px; width:90%;">
+            <div id="studentDetails"></div>
+            <button onclick="closeModal()" style="margin-top:15px; padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Close</button>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();

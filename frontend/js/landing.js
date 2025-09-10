@@ -1,3 +1,4 @@
+//frontend/js/landing.js
 const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api";
 
 // UI state
