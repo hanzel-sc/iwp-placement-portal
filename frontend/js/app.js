@@ -3,19 +3,30 @@
 let currentUser = null;
 const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api";
 
-// Authentication check
+// Get the base path for the application
+function getBasePath() {
+    const path = window.location.pathname;
+    if (path.includes('/frontend/')) {
+        return path.substring(0, path.indexOf('/frontend/')) + '/frontend/';
+    }
+    return '/';
+}
+
+// Authentication check - FIXED for Vercel
 function checkAuth() {
     const token = localStorage.getItem('token');
     const userType = localStorage.getItem('userType');
     
     if (!token || userType !== 'company') {
-        // Try multiple possible paths for index.html
-        if (window.location.pathname.includes("/frontend/company/")) {
-            window.location.href = "../index.html";
-        } else if (window.location.pathname.includes('/company/')) {
-            window.location.href = "../frontend/index.html";
+        // Use relative path for Vercel deployment
+        const currentPath = window.location.pathname;
+        const basePath = getBasePath();
+        
+        // Navigate to index.html relative to current location
+        if (currentPath.includes('/company/')) {
+            window.location.href = '../index.html';
         } else {
-            window.location.href = "index.html";
+            window.location.href = basePath + 'index.html';
         }
         return false;
     }
@@ -28,12 +39,15 @@ if (!window.location.pathname.includes('index.html')) {
     checkAuth();
 }
 
-// Logout function - FIXED
+// Logout function - FIXED for Vercel
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
     localStorage.removeItem('userId');
-    window.location.href = "/frontend/index.html"; // Fixed: Use forward slash and absolute path
+    
+    // Use relative path for Vercel deployment
+    const basePath = getBasePath();
+    window.location.href = basePath + 'index.html';
 }
 
 // API utility functions
@@ -455,158 +469,6 @@ function displayRecentJobs(jobs) {
             (new Date(job.applicationDeadline) - new Date()) < (7 * 24 * 60 * 60 * 1000) : false;
         
         return `
-            <div class="job-card detailed">
-                <div class="job-header">
-                    <div class="job-title-section">
-                        <h3 class="job-title">${job.jobTitle || 'Untitled Job'}</h3>
-                        <div class="job-department">${job.department || 'Department not specified'}</div>
-                    </div>
-                    <div class="job-status">
-                        <span class="status-badge ${job.status || 'active'}">${job.status || 'active'}</span>
-                        <span class="applications-count">${job.applicationsCount || 0} Applications</span>
-                    </div>
-                </div>
-                
-                <div class="job-meta-detailed">
-                    <div class="meta-row">
-                        <span class="meta-item">
-                            <i>📍</i>
-                            <strong>Location:</strong> ${job.location || 'Location not specified'}
-                        </span>
-                        <span class="meta-item">
-                            <i>💼</i>
-                            <strong>Type:</strong> ${job.jobType || 'Type not specified'}
-                        </span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-item">
-                            <i>💰</i>
-                            <strong>Salary:</strong> ${salaryDisplay}
-                        </span>
-                        <span class="meta-item">
-                            <i>🎓</i>
-                            <strong>Experience:</strong> ${job.experience || 'Not specified'}
-                        </span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-item">
-                            <i>📅</i>
-                            <strong>Posted:</strong> ${postedDate}
-                        </span>
-                        <span class="meta-item ${isDeadlineNear ? 'deadline-warning' : ''}">
-                            <i>⏰</i>
-                            <strong>Deadline:</strong> ${deadline}
-                            ${isDeadlineNear ? '<span class="urgent-tag">Urgent</span>' : ''}
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="job-description-preview">
-                    <strong>Job Description:</strong>
-                    <p>${job.jobDescription ? 
-                        (job.jobDescription.length > 200 ? 
-                            job.jobDescription.substring(0, 200) + '...' : 
-                            job.jobDescription) : 
-                        'No description available'}</p>
-                </div>
-                
-                ${job.skills ? `
-                    <div class="job-skills">
-                        <strong>Required Skills:</strong>
-                        <div class="skills-tags">
-                            ${job.skills.split(',').map(skill => 
-                                `<span class="skill-tag">${skill.trim()}</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-                
-                ${job.eligibility ? `
-                    <div class="job-eligibility">
-                        <strong>Eligibility:</strong>
-                        <p>${job.eligibility.length > 150 ? 
-                            job.eligibility.substring(0, 150) + '...' : 
-                            job.eligibility}</p>
-                    </div>
-                ` : ''}
-                
-                <div class="job-actions">
-                    <button class="btn btn-outline" onclick="viewJobDetails(${job.id})">
-                        View Full Details
-                    </button>
-                    <button class="btn btn-outline" onclick="viewJobApplications(${job.id})">
-                        View Applications (${job.applicationsCount || 0})
-                    </button>
-                    <button class="btn btn-secondary" onclick="editJob(${job.id})">
-                        Edit Job
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Function to view full job details (you can implement this)
-function viewJobDetails(jobId) {
-    // You can implement this to show a modal or navigate to a detailed view
-    window.location.href = `job-details.html?id=${jobId}`;
-}
-
-// Function to view applications for a specific job
-function viewJobApplications(jobId) {
-    window.location.href = `view-applications.html?jobId=${jobId}`;
-}
-
-// Function to edit a job (you can implement this)
-function editJob(jobId) {
-    window.location.href = `edit-job.html?id=${jobId}`;
-}
-
-// Enhanced function to display recent applications with more details
-// Updated displayRecentJobs function with delete button
-function displayRecentJobs(jobs) {
-    const container = document.getElementById('recentJobs');
-    
-    console.log('Displaying jobs:', jobs); // Debug log
-    
-    if (!jobs || jobs.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <h3>No job postings yet</h3>
-                <p>Start recruiting by creating your first job posting</p>
-                <a href="create-job.html" class="btn btn-primary">Create Job Posting</a>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = jobs.map(job => {
-        // Format salary display
-        const salaryDisplay = job.salary ? 
-            (job.salary.includes('-') ? `₹${job.salary}` : `₹${job.salary}`) : 
-            'Salary not disclosed';
-        
-        // Format date
-        const postedDate = job.createdAt ? 
-            new Date(job.createdAt).toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            }) : 'Date not available';
-        
-        // Format deadline
-        const deadline = job.applicationDeadline ? 
-            new Date(job.applicationDeadline).toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            }) : 'No deadline';
-        
-        // Check if deadline is approaching (within 7 days)
-        const isDeadlineNear = job.applicationDeadline ? 
-            (new Date(job.applicationDeadline) - new Date()) < (7 * 24 * 60 * 60 * 1000) : false;
-        
-        return `
             <div class="job-card detailed" id="job-card-${job.id}">
                 <div class="job-header">
                     <div class="job-title-section">
@@ -699,6 +561,22 @@ function displayRecentJobs(jobs) {
             </div>
         `;
     }).join('');
+}
+
+// Function to view full job details (you can implement this)
+function viewJobDetails(jobId) {
+    // You can implement this to show a modal or navigate to a detailed view
+    window.location.href = `job-details.html?id=${jobId}`;
+}
+
+// Function to view applications for a specific job
+function viewJobApplications(jobId) {
+    window.location.href = `view-applications.html?jobId=${jobId}`;
+}
+
+// Function to edit a job (you can implement this)
+function editJob(jobId) {
+    window.location.href = `edit-job.html?id=${jobId}`;
 }
 
 // Function to confirm job deletion
