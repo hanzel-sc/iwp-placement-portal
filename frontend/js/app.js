@@ -1,7 +1,7 @@
 //frontend/js/app.js
 // Global variables
 let currentUser = null;
-const API_BASE_URL = process.env.API_URL;// should will be moved to env variable in production
+const API_BASE_URL = process.env.API_PUBLIC_URL;// should will be moved to env variable in production
 
 // Authentication check
 function checkAuth() {
