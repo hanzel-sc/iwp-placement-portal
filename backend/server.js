@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV === 'development') {
+    require('dotenv').config({ path: '.env.local' });
+} else {
+    require('dotenv').config();
+}
+
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -5,7 +11,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config();
+
 
 // Import routes
 const authRoutes = require('./routes/auth');
