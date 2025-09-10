@@ -1,15 +1,31 @@
 {
-  "version": 2,
-  "builds": [
+  "functions": {},
+  "rewrites": [
     {
-      "src": "frontend/**/*",
-      "use": "@vercel/static"
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/company/(.*)",
+      "destination": "/frontend/company/$1"
+    },
+    {
+      "source": "/student/(.*)",
+      "destination": "/frontend/student/$1"
+    },
+    {
+      "source": "/js/(.*)",
+      "destination": "/frontend/js/$1"
+    },
+    {
+      "source": "/css/(.*)",
+      "destination": "/frontend/css/$1"
+    },
+    {
+      "source": "/images/(.*)",
+      "destination": "/frontend/images/$1"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
-  ]
+  "trailingSlash": false,
+  "cleanUrls": true
 }
