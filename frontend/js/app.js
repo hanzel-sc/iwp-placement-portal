@@ -1,7 +1,7 @@
 //frontend/js/app.js
 // Global variables
 let currentUser = null;
-const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app;"
+const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api;"
 
 // Authentication check
 function checkAuth() {
