@@ -5,12 +5,20 @@
       "destination": "/frontend/index.html"
     },
     {
-      "source": "/company/(.*)",
-      "destination": "/frontend/company/$1"
+      "source": "/company/company-dashboard.html",
+      "destination": "/frontend/company/company-dashboard.html"
     },
     {
-      "source": "/student/(.*)",
-      "destination": "/frontend/student/$1"
+      "source": "/company/company-profile.html", 
+      "destination": "/frontend/company/company-profile.html"
+    },
+    {
+      "source": "/company/create-job.html",
+      "destination": "/frontend/company/create-job.html"
+    },
+    {
+      "source": "/company/view-applications.html",
+      "destination": "/frontend/company/view-applications.html"
     },
     {
       "source": "/js/(.*)",
@@ -26,5 +34,5 @@
     }
   ],
   "trailingSlash": false,
-  "cleanUrls": true
+  "cleanUrls": false
 }
