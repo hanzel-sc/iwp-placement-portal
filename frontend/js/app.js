@@ -1,7 +1,7 @@
 //frontend/js/app.js
 // Global variables
 let currentUser = null;
-const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api;"
+const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api";
 
 // Authentication check
 function checkAuth() {
@@ -10,7 +10,7 @@ function checkAuth() {
     
     if (!token || userType !== 'company') {
         // Try multiple possible paths for index.html
-        if (window.location.pathname.includes('/frontend/company/')) {
+        if (window.location.pathname.includes("/frontend/company/")) {
             window.location.href = "../index.html";
         } else if (window.location.pathname.includes('/company/')) {
             window.location.href = "../frontend/index.html";
