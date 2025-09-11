@@ -1,62 +1,237 @@
+<!--index.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CHRIST University Placement Portal</title>
-  <link rel="stylesheet" href="css/landing.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christ University Placement Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing.css">
+        <script>
+        // Authorization check - redirect if not authorized
+        if (!sessionStorage.getItem('authorized')) {
+            // For Vercel deployment (splash is index.html)
+            if (window.location.pathname === '/home.html' || window.location.pathname === '/main.html') {
+                window.location.href = '/';
+            }
+            // For local development (splash is splash.html)
+            else if (window.location.pathname === '/index.html' || window.location.pathname === '/') {
+                window.location.href = 'auth.html';
+            }
+        }
+    </script>
 </head>
 <body>
-  <header>
-    <div class="top-nav">
-      <div class="logo-area">
-        <img src="https://christuniversity.in/images/logo.png" alt="Christ University"/>
-        <span class="site-title">Placement Cell</span>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Jobs</a></li>
-          <li><a href="#">Post Resume</a></li>
-          <li><a href="#">About us</a></li>
-          <li><button id="openModalBtn" class="btn-link">Login</button></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-  <main>
-    <div class="landing-section">
-      <div class="info-left">
-        <h1>CHRIST UNIVERSITY PLACEMENT CELL</h1>
-        <p>CHRIST University’s Placement Portal connects students with recruiters, offering job listings, career support, and smooth campus placement coordination.</p>
-      </div>
-      <div class="form-card">
-        <div class="tabs">
-          <button class="tab-btn active" data-role="company">Company</button>
-          <button class="tab-btn" data-role="student">Candidate</button>
-          <button class="tab-btn" data-role="faculty">Faculty</button>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="https://christuniversity.in/images/logo.png" alt="Christ University" class="nav-logo">
+                <span class="nav-title">Placement Portal</span>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#about" class="nav-link">About</a>
+                <button class="nav-cta" id="loginBtn">Get Started</button>
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
-        <div id="authForms">
-          <!-- Form content will be inserted by JS based on tab and mode (login/register) -->
-        </div>
-        <div class="switch-mode">
-          <span id="switchText">New here?</span>
-          <button id="toggleModeBtn">Register</button>
-        </div>
-        <div id="formAlert"></div>
-      </div>
-    </div>
-  </main>
+    </nav>
 
-  <!-- Modal for mobile -->
-  <div id="modalOverlay" class="modal-overlay" style="display:none">
-    <div class="modal-centered">
-      <button id="closeModalBtn" class="modal-close">×</button>
-      <!-- Reuse same form as desktop -->
-      <div class="modal-form-container"></div>
-    </div>
-  </div>
+    <!-- Hero Section -->
+    <main class="main-content">
+        <section class="hero" id="home">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">
+                            Christ University
+                            <span class="highlight">Placement Portal</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Connecting talented students with leading companies. 
+                            Your gateway to amazing career opportunities starts here.
+                        </p>
+                        <div class="hero-cta">
+                            <button class="btn btn-primary" id="getStartedBtn">
+                                Get Started Today
+                                <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-secondary" id="learnMoreBtn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="hero-card">
+                        <div class="card-header">
+                            <div class="user-roles">
+                                <button class="role-btn active" data-role="student">Student</button>
+                                <button class="role-btn" data-role="company">Company</button>
+                                <button class="role-btn" data-role="faculty">Faculty</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="authForm" class="auth-form">
+                                <!-- Form will be injected by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <script src="js/landing.js"></script>
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="features-container">
+                <div class="section-header">
+                    <h2 class="section-title">Why Choose Our Platform?</h2>
+                    <p class="section-subtitle">Streamlined placement process for everyone</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Smart Matching</h3>
+                        <p class="feature-description">
+                            AI-powered job matching connects students with the most relevant opportunities based on skills and interests.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21V5A2 2 0 0 0 14 3H10A2 2 0 0 0 8 5V21L12 19L16 21Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Easy Applications</h3>
+                        <p class="feature-description">
+                            Apply to multiple companies with one click. Track application status in real-time through your dashboard.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12L11 14L15 10M21 12A9 9 0 1 1 12 3A9 9 0 0 1 21 12Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Verified Companies</h3>
+                        <p class="feature-description">
+                            All companies are verified by our placement team to ensure authentic and quality job opportunities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">2000+</div>
+                        <div class="stat-label">Students Placed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Partner Companies</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Placement Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">12LPA</div>
+                        <div class="stat-label">Average Package</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="https://christuniversity.in/images/logo.png" alt="Christ University" class="footer-logo">
+                    <p class="footer-description">
+                        Christ University Placement Portal - Your gateway to success
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <a href="#home">Home</a>
+                        <a href="#features">Features</a>
+                        <a href="#about">About</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>For Students</h4>
+                        <a href="#" id="studentLoginLink">Student Login</a>
+                        <a href="#">Job Search</a>
+                        <a href="#">Profile</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>For Companies</h4>
+                        <a href="#" id="companyLoginLink">Company Login</a>
+                        <a href="#">Post Jobs</a>
+                        <a href="#">Find Talent</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Christ University. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Get Started</h3>
+                <button class="modal-close" id="modalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tabs">
+                    <button class="tab-btn active" data-role="student">Student</button>
+                    <button class="tab-btn" data-role="company">Company</button>
+                    <button class="tab-btn" data-role="faculty">Faculty</button>
+                </div>
+                <div id="modalAuthForm" class="modal-auth-form">
+                    <!-- Form will be injected by JavaScript -->
+                </div>
+                <div class="mode-toggle">
+                    <span id="toggleText">New here?</span>
+                    <button id="modeToggleBtn" class="toggle-btn">Create Account</button>
+                </div>
+                <div id="modalAlert" class="modal-alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/landing.js"></script>
 </body>
 </html>

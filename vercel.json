@@ -2,6 +2,14 @@
   "rewrites": [
     {
       "source": "/",
+      "destination": "/fronend/auth.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/main",
       "destination": "/frontend/index.html"
     },
     {

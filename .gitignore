@@ -24,6 +24,8 @@ jspm_packages/
 # Environment variables
 .env
 *.env
+.env.local
+
 
 # OS files
 .DS_Store

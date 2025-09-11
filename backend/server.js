@@ -1,5 +1,5 @@
 if (process.env.NODE_ENV === 'development') {
-    require('dotenv').config({ path: '.env.local' });
+    require('dotenv').config({ path: '.env.local'});
 } else {
     require('dotenv').config();
 }
@@ -12,6 +12,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const envLocalPath = path.join(__dirname, '.env.local');
+const envPath = path.join(__dirname, '.env');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -24,8 +26,27 @@ const db = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const corsOptions = {
+    origin: [
+        // Development origins
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5500',
+        'http://127.0.0.1:5500',
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+        // Production origin (your Railway URL)
+        'https://iwp-placement-portal-production.up.railway.app'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    optionsSuccessStatus: 200
+};
+
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,6 +67,7 @@ app.use('/api/jobs', jobRoutes);
 // Additional API routes for cross-functionality
 app.use('/api/students', require('./routes/students'));
 app.use('/api/applications', require('./routes/applications'));
+app.use('/api/faculty', require('./routes/faculty'));
 
 // Error handling middleware
 app.use((error, req, res, next) => {

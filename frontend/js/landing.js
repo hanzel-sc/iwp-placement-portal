@@ -1,488 +1,630 @@
-const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api";
-
-// UI state
-let currentRole = 'company';
-let mode = 'login';
+//js/landing.js
+const API_BASE_URL = 'http://localhost:3000/api';
+// const API_BASE_URL = 'https://your-production-url.com/api';
+(function() {
+    if (!sessionStorage.getItem('authenticated')) {
+        const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        
+        if (isVercel) {
+            // On Vercel, redirect to root (splash screen)
+            window.location.href = '/';
+        } else {
+            // Local development, redirect to splash.html
+            window.location.href = 'auth.html';
+        }
+    }
+})();
+// State
+let currentRole = 'student';
+let currentMode = 'login';
+let heroMode = 'login'; // Separate state for hero form
 
 // DOM Elements
-const formAlert = document.getElementById('formAlert');
-const tabs = document.querySelectorAll('.tab-btn');
-const authForms = document.getElementById('authForms');
-const switchBtn = document.getElementById('toggleModeBtn');
-const switchText = document.getElementById('switchText');
-const modalOverlay = document.getElementById('modalOverlay');
-const openModalBtn = document.getElementById('openModalBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
+const navToggle = document.getElementById('navToggle');
+const navMenu = document.getElementById('navMenu');
+const authModal = document.getElementById('authModal');
+const modalClose = document.getElementById('modalClose');
+const authForm = document.getElementById('authForm');
+const modalAuthForm = document.getElementById('modalAuthForm');
 
-// Mobile elements (will be created dynamically)
-let hamburger = null;
-let mobileNav = null;
-let mobileNavOverlay = null;
-let mobileCTABtn = null;
-
-// Utility: Render the form for current role and mode
-function renderAuthForm(container) {
-  let html = `<form id="authForm" class="form-inner">`;
-  if (mode === 'register') {
-    if (currentRole === 'company') {
-      html += `
-        <label>Full Name*</label>
-        <input required type="text" name="contactPerson" placeholder="Your Name">
-        <label>Company Name*</label>
-        <input required type="text" name="companyName" placeholder="Company Name">
-        <label>Email*</label>
-        <input required type="email" name="email" placeholder="Company Email">
-        <label>Password*</label>
-        <input required type="password" name="password" placeholder="Password">
-      `;
-    } else if (currentRole === 'student') {
-      html += `
-        <label>Full Name*</label>
-        <input required type="text" name="fullName" placeholder="Your Name">
-        <label>Email*</label>
-        <input required type="email" name="email" placeholder="Student Email">
-        <label>Password*</label>
-        <input required type="password" name="password" placeholder="Password">
-      `;
-    } else if (currentRole === 'faculty') {
-      html += `
-        <label>Full Name*</label>
-        <input required type="text" name="fullName" placeholder="Your Name">
-        <label>Email*</label>
-        <input required type="email" name="email" placeholder="Faculty Email">
-        <label>Password*</label>
-        <input required type="password" name="password" placeholder="Password">
-      `;
-    }
-    html += `<button type="submit">Register</button></form>`;
-  } else {
-    html += `
-      <label>Email</label>
-      <input required type="email" name="email" placeholder="Email">
-      <label>Password</label>
-      <input required type="password" name="password" placeholder="Password">
-      <button type="submit">Login</button>
-    </form>`;
-  }
-  container.innerHTML = html;
-}
-
-// Utility: Render tabs in modal
-function renderModalTabs(container) {
-  const tabsHtml = `
-    <div class="tabs">
-      <button type="button" class="tab-btn ${currentRole === 'company' ? 'active' : ''}" data-role="company">Company</button>
-      <button type="button" class="tab-btn ${currentRole === 'student' ? 'active' : ''}" data-role="student">Student</button>
-      <button type="button" class="tab-btn ${currentRole === 'faculty' ? 'active' : ''}" data-role="faculty">Faculty</button>
-    </div>
-    <div id="modalAuthForms"></div>
-    <div class="switch-mode">
-      <span id="modalSwitchText">${mode === 'register' ? 'Already have an account?' : 'New here?'}</span>
-      <button type="button" id="modalToggleModeBtn">${mode === 'register' ? 'Back to Login' : 'Register'}</button>
-    </div>
-    <div id="modalFormAlert"></div>
-  `;
-  container.innerHTML = tabsHtml;
-}
-
-// Role Tab Switching (Desktop)
-tabs.forEach(btn => {
-  btn.onclick = () => {
-    tabs.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentRole = btn.dataset.role;
-    renderAuthForm(authForms);
-    attachFormHandler();
-  }
-});
-
-// Switch Login/Register Mode (Desktop)
-if (switchBtn) {
-  switchBtn.onclick = function() {
-    mode = (mode === 'login') ? 'register' : 'login';
-    switchBtn.textContent = mode === 'register' ? 'Back to Login' : 'Register';
-    if (switchText) {
-      switchText.textContent = mode === 'register' ? 'Already have an account?' : 'New here?';
-    }
-    renderAuthForm(authForms);
-    attachFormHandler();
-    if (formAlert) {
-      formAlert.innerHTML = '';
-    }
-  };
-}
-
-// Auth form submit handler
-function attachFormHandler(isModal = false) {
-  const form = document.getElementById('authForm');
-  if (!form) return;
-
-  const alertElement = isModal ? 
-    document.getElementById('modalFormAlert') || formAlert : 
-    formAlert;
-
-  form.onsubmit = async function(e) {
-    e.preventDefault();
-    if (alertElement) {
-      alertElement.className = '';
-      alertElement.innerHTML = 'Processing...';
-    }
-
-    let endpoint, payload = {};
-    if (mode === 'login') {
-      endpoint = `/auth/${currentRole}/login`;
-      payload.email = form.email.value.trim();
-      payload.password = form.password.value;
-    } else {
-      endpoint = `/auth/${currentRole}/register`;
-      if (currentRole === 'company') {
-        payload.companyName = form.companyName.value.trim();
-        payload.contactPerson = form.contactPerson.value.trim();
-        payload.email = form.email.value.trim();
-        payload.password = form.password.value;
-      } else {
-        payload.fullName = form.fullName.value.trim();
-        payload.email = form.email.value.trim();
-        payload.password = form.password.value;
-      }
-    }
-
-    try {
-      const resp = await fetch(API_BASE_URL + endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await resp.json();
-      if (!resp.ok || !data.success) {
-        throw new Error(data.message || "Auth failed");
-      }
-      if (mode === 'login') {
-        // Save token, role, user id
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userType", currentRole);
-        localStorage.setItem("userId", data.user.id);
-        
-        // Redirect based on role
-        if (currentRole === "company") {
-          location.href = "/company/company-dashboard.html";
-        } else if (currentRole === "student") {
-          location.href = "/student/student-dashboard.html";
-        } else if (currentRole === "faculty") {
-          location.href = "/faculty/faculty-dashboard.html";
-        }
-      } else {
-        if (alertElement) {
-          alertElement.className = 'success';
-          alertElement.innerHTML = "Registration successful. Please login!";
-        }
-        mode = "login";
-        
-        // Update UI for login mode
-        updateModeUI(isModal);
-      }
-    } catch (err) {
-      if (alertElement) {
-        alertElement.className = 'error';
-        alertElement.innerHTML = err.message;
-      }
-    }
-  };
-}
-
-// Update UI when switching between login/register modes
-function updateModeUI(isModal = false) {
-  if (isModal) {
-    const modalSwitchBtn = document.getElementById('modalToggleModeBtn');
-    const modalSwitchText = document.getElementById('modalSwitchText');
-    const modalAuthForms = document.getElementById('modalAuthForms');
-    
-    if (modalSwitchBtn) {
-      modalSwitchBtn.textContent = mode === 'register' ? 'Back to Login' : 'Register';
-    }
-    if (modalSwitchText) {
-      modalSwitchText.textContent = mode === 'register' ? 'Already have an account?' : 'New here?';
-    }
-    if (modalAuthForms) {
-      renderAuthForm(modalAuthForms);
-      attachFormHandler(true);
-    }
-  } else {
-    if (switchBtn) {
-      switchBtn.textContent = mode === 'register' ? 'Back to Login' : 'Register';
-    }
-    if (switchText) {
-      switchText.textContent = mode === 'register' ? 'Already have an account?' : 'New here?';
-    }
-    if (authForms) {
-      renderAuthForm(authForms);
-      attachFormHandler(false);
-    }
-  }
-}
-
-// Initialize Mobile Navigation and Modal
-function initializeMobileFeatures() {
-  // Only initialize on mobile
-  if (window.innerWidth > 480) return;
-  
-  // Create hamburger menu
-  createHamburgerMenu();
-  
-  // Create mobile CTA button
-  createMobileCTAButton();
-  
-  // Setup mobile modal
-  setupMobileModal();
-}
-
-// Create hamburger menu
-function createHamburgerMenu() {
-  if (hamburger) return; // Already created
-  
-  const nav = document.querySelector('.top-nav');
-  if (!nav) return;
-  
-  // Create hamburger button
-  const hamburgerBtn = document.createElement('button');
-  hamburgerBtn.className = 'hamburger-menu';
-  hamburgerBtn.innerHTML = '<span></span><span></span><span></span>';
-  
-  // Create mobile nav overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'mobile-nav-overlay';
-  
-  // Create mobile nav sidebar
-  const sidebar = document.createElement('div');
-  sidebar.className = 'mobile-nav';
-  
-  // Create navigation content for mobile
-  const navContent = `
-    <div class="mobile-nav-header">
-      <div class="logo">
-        <img src="/assets/logo.png" alt="Logo">
-        <span class="logo-text">Placement Portal</span>
-      </div>
-    </div>
-    <ul>
-      <li><a href="#" onclick="openAuthModal('student')">Student Login</a></li>
-      <li><a href="#" onclick="openAuthModal('faculty')">Faculty Login</a></li>
-      <li><a href="#" onclick="openAuthModal('company')">Company Login</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  `;
-  
-  sidebar.innerHTML = navContent;
-  
-  nav.appendChild(hamburgerBtn);
-  document.body.appendChild(overlay);
-  document.body.appendChild(sidebar);
-  
-  // Set up references
-  hamburger = hamburgerBtn;
-  mobileNav = sidebar;
-  mobileNavOverlay = overlay;
-  
-  // Add event listeners
-  hamburger.addEventListener('click', toggleMobileMenu);
-  mobileNavOverlay.addEventListener('click', closeMobileMenu);
-  
-  // Close mobile menu when clicking nav links
-  const mobileNavLinks = mobileNav.querySelectorAll('a');
-  mobileNavLinks.forEach(link => {
-    link.addEventListener('click', closeMobileMenu);
-  });
-}
-
-// Create mobile CTA button
-function createMobileCTAButton() {
-  if (mobileCTABtn) return; // Already created
-  
-  const infoLeft = document.querySelector('.info-left');
-  if (!infoLeft) return;
-  
-  const ctaDiv = document.createElement('div');
-  ctaDiv.className = 'mobile-cta';
-  
-  const ctaBtn = document.createElement('button');
-  ctaBtn.className = 'mobile-cta-btn';
-  ctaBtn.textContent = 'Get Started';
-  
-  ctaDiv.appendChild(ctaBtn);
-  infoLeft.appendChild(ctaDiv);
-  
-  mobileCTABtn = ctaBtn;
-  
-  // Add event listener
-  mobileCTABtn.addEventListener('click', function() {
-    openAuthModal();
-    closeMobileMenu();
-  });
-}
-
-// Setup mobile modal
-function setupMobileModal() {
-  if (!modalOverlay) return;
-  
-  // Ensure modal has proper structure
-  const modalCentered = modalOverlay.querySelector('.modal-centered');
-  if (!modalCentered) return;
-  
-  // Add close button if it doesn't exist
-  if (!modalCentered.querySelector('.modal-close')) {
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'modal-close';
-    closeBtn.innerHTML = '×';
-    closeBtn.addEventListener('click', closeAuthModal);
-    modalCentered.appendChild(closeBtn);
-  }
-  
-  // Add event listeners
-  modalOverlay.addEventListener('click', function(e) {
-    if (e.target === modalOverlay) {
-      closeAuthModal();
-    }
-  });
-}
-
-// Mobile menu functions
-function toggleMobileMenu() {
-  const isOpen = mobileNav?.classList.contains('active');
-  
-  if (isOpen) {
-    closeMobileMenu();
-  } else {
-    openMobileMenu();
-  }
-}
-
-function openMobileMenu() {
-  if (!hamburger || !mobileNav || !mobileNavOverlay) return;
-  
-  hamburger.classList.add('active');
-  mobileNav.classList.add('active');
-  mobileNavOverlay.classList.add('active');
-  document.body.classList.add('mobile-menu-open');
-}
-
-function closeMobileMenu() {
-  if (!hamburger || !mobileNav || !mobileNavOverlay) return;
-  
-  hamburger.classList.remove('active');
-  mobileNav.classList.remove('active');
-  mobileNavOverlay.classList.remove('active');
-  document.body.classList.remove('mobile-menu-open');
-}
-
-// Modal functions
-function openAuthModal(role = currentRole) {
-  if (!modalOverlay) return;
-  
-  currentRole = role;
-  
-  const modalCentered = modalOverlay.querySelector('.modal-centered');
-  if (!modalCentered) return;
-  
-  // Render tabs and form in modal
-  renderModalTabs(modalCentered);
-  
-  // Render the auth form
-  const modalAuthForms = document.getElementById('modalAuthForms');
-  if (modalAuthForms) {
-    renderAuthForm(modalAuthForms);
-    attachFormHandler(true);
-  }
-  
-  // Setup modal tab switching
-  const modalTabs = modalCentered.querySelectorAll('.tab-btn');
-  modalTabs.forEach(btn => {
-    btn.onclick = () => {
-      modalTabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRole = btn.dataset.role;
-      renderAuthForm(modalAuthForms);
-      attachFormHandler(true);
-    };
-  });
-  
-  // Setup modal mode switching
-  const modalToggleBtn = document.getElementById('modalToggleModeBtn');
-  if (modalToggleBtn) {
-    modalToggleBtn.onclick = function() {
-      mode = (mode === 'login') ? 'register' : 'login';
-      updateModeUI(true);
-      const modalFormAlert = document.getElementById('modalFormAlert');
-      if (modalFormAlert) {
-        modalFormAlert.innerHTML = '';
-      }
-    };
-  }
-  
-  // Show modal
-  modalOverlay.classList.add('active');
-  document.body.classList.add('mobile-menu-open');
-}
-
-function closeAuthModal() {
-  if (!modalOverlay) return;
-  
-  modalOverlay.classList.remove('active');
-  document.body.classList.remove('mobile-menu-open');
-}
-
-// Make openAuthModal globally available for inline onclick handlers
-window.openAuthModal = openAuthModal;
-
-// Desktop modal handlers (if they exist)
-if (openModalBtn) {
-  openModalBtn.onclick = function() {
-    openAuthModal();
-  };
-}
-
-if (closeModalBtn) {
-  closeModalBtn.onclick = closeAuthModal;
-}
-
-// Window resize handler
-window.addEventListener('resize', function() {
-  if (window.innerWidth > 480) {
-    closeMobileMenu();
-    // Clean up mobile elements if needed
-  } else if (window.innerWidth <= 480) {
-    // Reinitialize mobile features if needed
-    initializeMobileFeatures();
-  }
-});
-
-// DOM Content Loaded - Initialize everything
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize desktop form
-  if (authForms) {
-    renderAuthForm(authForms);
-    attachFormHandler();
-  }
-  
-  // Initialize mobile features
-  initializeMobileFeatures();
+    initializeEventListeners();
+    renderAuthForm(authForm, true); // true indicates it's hero form
+    setupIntersectionObserver();
+    console.log('Page loaded successfully');
 });
 
-// Initialize on load as well (in case DOMContentLoaded already fired)
-if (document.readyState === 'loading') {
-  // DOM is still loading
-  document.addEventListener('DOMContentLoaded', function() {
-    if (authForms) {
-      renderAuthForm(authForms);
-      attachFormHandler();
-    }
-    initializeMobileFeatures();
-  });
-} else {
-  // DOM is already loaded
-  if (authForms) {
-    renderAuthForm(authForms);
-    attachFormHandler();
-  }
-  initializeMobileFeatures();
+// Event Listeners
+function initializeEventListeners() {
+    // Navigation toggle
+    navToggle?.addEventListener('click', toggleMobileMenu);
+    
+    // Modal triggers
+    document.getElementById('loginBtn')?.addEventListener('click', () => openModal('student'));
+    document.getElementById('getStartedBtn')?.addEventListener('click', () => openModal('student'));
+    document.getElementById('learnMoreBtn')?.addEventListener('click', () => {
+        document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    // Footer links
+    document.getElementById('studentLoginLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal('student');
+    });
+    document.getElementById('companyLoginLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal('company');
+    });
+    
+    // Modal close
+    modalClose?.addEventListener('click', closeModal);
+    authModal?.addEventListener('click', (e) => {
+        if (e.target === authModal) closeModal();
+    });
+    
+    // Role buttons in hero
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentRole = btn.dataset.role;
+            heroMode = 'login'; // Reset hero form mode when switching roles
+            renderAuthForm(authForm, true);
+            clearAlert('heroAlert');
+        });
+    });
+    
+    // Escape key to close modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
 }
+
+// Mobile Menu
+function toggleMobileMenu() {
+    navMenu?.classList.toggle('active');
+    navToggle?.classList.toggle('active');
+}
+
+// Modal Functions
+function openModal(role = currentRole) {
+    currentRole = role;
+    currentMode = 'login'; // Always start with login
+    
+    setupModalTabs();
+    renderAuthForm(modalAuthForm);
+    setupModeToggle();
+    
+    authModal?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    clearAlert('modalAlert');
+}
+
+function closeModal() {
+    authModal?.classList.remove('active');
+    document.body.style.overflow = '';
+    clearAlert('modalAlert');
+}
+
+function setupModalTabs() {
+    const modalBody = document.querySelector('.modal-body');
+    const tabBtns = modalBody?.querySelectorAll('.tab-btn');
+    
+    tabBtns?.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.role === currentRole) {
+            btn.classList.add('active');
+        }
+        
+        // Clone to remove existing listeners
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+    });
+    
+    // Add fresh listeners
+    modalBody?.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            modalBody.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentRole = btn.dataset.role;
+            renderAuthForm(modalAuthForm);
+            clearAlert('modalAlert');
+        });
+    });
+}
+
+function setupModeToggle() {
+    const toggleBtn = document.getElementById('modeToggleBtn');
+    const toggleText = document.getElementById('toggleText');
+    
+    if (toggleBtn && toggleText) {
+        toggleText.textContent = currentMode === 'login' ? 'New here?' : 'Already have an account?';
+        toggleBtn.textContent = currentMode === 'login' ? 'Create Account' : 'Back to Login';
+        
+        const newToggleBtn = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+        
+        newToggleBtn.addEventListener('click', () => {
+            currentMode = currentMode === 'login' ? 'register' : 'login';
+            setupModeToggle();
+            renderAuthForm(modalAuthForm);
+            clearAlert('modalAlert');
+        });
+    }
+}
+
+// Enhanced Auto-Switch Function for both forms
+function autoSwitchToRegister(email = '', isHeroForm = false) {
+    console.log('Auto-switching to register mode with email:', email, 'isHeroForm:', isHeroForm);
+    
+    if (isHeroForm) {
+        heroMode = 'register';
+        renderAuthForm(authForm, true);
+        
+        // Wait for form to render, then pre-fill email
+        setTimeout(() => {
+            if (email) {
+                const emailInput = authForm?.querySelector('input[name="email"]');
+                if (emailInput) {
+                    emailInput.value = email;
+                    console.log('Email pre-filled in hero form:', email);
+                }
+            }
+        }, 100);
+        
+        showAlert('heroAlert', 'Account not found. Please create a new account below.', 'info');
+    } else {
+        currentMode = 'register';
+        setupModeToggle();
+        renderAuthForm(modalAuthForm);
+        
+        // Wait for form to render, then pre-fill email
+        setTimeout(() => {
+            if (email) {
+                const emailInput = modalAuthForm?.querySelector('input[name="email"]');
+                if (emailInput) {
+                    emailInput.value = email;
+                    console.log('Email pre-filled in modal form:', email);
+                }
+            }
+        }, 100);
+        
+        showAlert('modalAlert', 'Account not found. Please create a new account below.', 'info');
+    }
+}
+
+// Enhanced Form Rendering with hero form support
+function renderAuthForm(container, isHeroForm = false) {
+    if (!container) return;
+    
+    const formMode = isHeroForm ? heroMode : currentMode;
+    const isRegister = formMode === 'register';
+    let formHTML = '<form class="auth-form" id="activeAuthForm">';
+    
+    if (isRegister) {
+        if (currentRole === 'company') {
+            formHTML += `
+                <div class="form-group">
+                    <label class="form-label">Contact Person Name *</label>
+                    <input type="text" name="contactPerson" class="form-input" required placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    <input type="text" name="companyName" class="form-input" required placeholder="Your company name">
+                </div>
+            `;
+        } else {
+            formHTML += `
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" name="fullName" class="form-input" required placeholder="Your full name">
+                </div>
+            `;
+        }
+    }
+    
+    formHTML += `
+        <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" class="form-input" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" name="password" class="form-input" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="form-submit">
+            ${isRegister ? 'Create Account' : 'Sign In'}
+        </button>
+    `;
+    
+    // Add mode toggle for hero form if in register mode
+    if (isHeroForm && isRegister) {
+        formHTML += `
+            <div class="mode-toggle" style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--gray-200);">
+                <span>Already have an account?</span>
+                <button type="button" id="heroModeToggle" class="toggle-btn">Back to Login</button>
+            </div>
+        `;
+    }
+    
+    formHTML += '</form>';
+    container.innerHTML = formHTML;
+    
+    // Add form submit listener
+    const form = container.querySelector('#activeAuthForm');
+    form?.addEventListener('submit', (e) => handleFormSubmit(e, isHeroForm));
+    
+    // Add hero mode toggle listener if present
+    if (isHeroForm) {
+        const heroToggle = document.getElementById('heroModeToggle');
+        heroToggle?.addEventListener('click', () => {
+            heroMode = 'login';
+            renderAuthForm(authForm, true);
+            clearAlert('heroAlert');
+        });
+    }
+}
+
+// FIXED: Enhanced Form Submission with better error handling
+async function handleFormSubmit(e, isHeroForm = false) {
+    e.preventDefault();
+    console.log('Form submitted:', { role: currentRole, mode: isHeroForm ? heroMode : currentMode, isHeroForm });
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Show loading
+    const submitBtn = e.target.querySelector('.form-submit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Please wait...';
+    submitBtn.disabled = true;
+    
+    const alertId = isHeroForm ? 'heroAlert' : 'modalAlert';
+    clearAlert(alertId);
+    
+    try {
+        const formMode = isHeroForm ? heroMode : currentMode;
+        const endpoint = formMode === 'login' ? 
+            `/auth/${currentRole}/login` : 
+            `/auth/${currentRole}/register`;
+            
+        console.log('API Request:', {
+            url: API_BASE_URL + endpoint,
+            method: 'POST',
+            data: { ...data, password: '[HIDDEN]' },
+            isHeroForm
+        });
+        
+        const response = await fetch(API_BASE_URL + endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        let result;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+        } else {
+            const text = await response.text();
+            result = { message: text || 'Server error' };
+        }
+        
+        console.log('Server Response:', {
+            status: response.status,
+            ok: response.ok,
+            data: result,
+            isHeroForm
+        });
+        
+        if (!response.ok) {
+            handleAuthError(response.status, result, data.email, isHeroForm);
+            return;
+        }
+        
+        if (formMode === 'login') {
+            // Successful login
+            if (result.token) {
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('userType', currentRole);
+                localStorage.setItem('userId', result.user?.id || result.id);
+            }
+            
+            showAlert(alertId, 'Login successful! Redirecting...', 'success');
+            
+            setTimeout(() => {
+                const redirectMap = {
+                    student: '/student/student-dashboard.html',
+                    faculty: '/faculty/faculty-dashboard.html',
+                    company: '/company/company-dashboard.html'
+                };
+                
+                window.location.href = redirectMap[currentRole];
+            }, 1500);
+            
+        } else {
+            // Successful registration
+            showAlert(alertId, 'Account created successfully! Please sign in.', 'success');
+            
+            setTimeout(() => {
+                if (isHeroForm) {
+                    heroMode = 'login';
+                    renderAuthForm(authForm, true);
+                } else {
+                    currentMode = 'login';
+                    setupModeToggle();
+                    renderAuthForm(modalAuthForm);
+                }
+                
+                // Pre-fill email
+                setTimeout(() => {
+                    const container = isHeroForm ? authForm : modalAuthForm;
+                    const emailInput = container?.querySelector('input[name="email"]');
+                    if (emailInput) {
+                        emailInput.value = data.email;
+                    }
+                }, 100);
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('Network Error:', error);
+        
+        // CRITICAL FIX: Handle network errors for non-existent users
+        const formMode = isHeroForm ? heroMode : currentMode;
+        if (formMode === 'login') {
+            console.log('Network error during login - assuming user not found');
+            showAlert(alertId, 'Checking if account exists...', 'info');
+            
+            setTimeout(() => {
+                autoSwitchToRegister(data.email, isHeroForm);
+            }, 1000);
+        } else {
+            showAlert(alertId, 'Network error. Please check your connection and try again.', 'error');
+        }
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// FIXED: Enhanced Error Handler with proper credential checking
+function handleAuthError(status, result, email, isHeroForm = false) {
+    const message = result.message || result.error || result.msg || 'Something went wrong';
+    const alertId = isHeroForm ? 'heroAlert' : 'modalAlert';
+    const formMode = isHeroForm ? heroMode : currentMode;
+    
+    console.log('Handling Auth Error:', {
+        status,
+        message,
+        currentMode: formMode,
+        email,
+        isHeroForm,
+        fullResult: result
+    });
+    
+    if (formMode === 'login') {
+        // Check for specific error types based on backend response
+        if (status === 404) {
+            // User definitely not found
+            console.log('404 - User not found, switching to register');
+            showAlert(alertId, 'Account not found. Switching to registration...', 'warning');
+            setTimeout(() => {
+                autoSwitchToRegister(email, isHeroForm);
+            }, 1500);
+            
+        } else if (status === 401) {
+            // Check if this is a "user not found" vs "wrong password" case
+            // Backend should differentiate, but we'll check message patterns
+            const userNotFoundPatterns = [
+                'user not found',
+                'email not found', 
+                'account not found',
+                'no user found',
+                'user does not exist',
+                'email not registered',
+                'invalid email'
+            ];
+            
+            const passwordErrorPatterns = [
+                'invalid password',
+                'wrong password',
+                'incorrect password', 
+                'password mismatch'
+            ];
+            
+            const isUserNotFound = userNotFoundPatterns.some(pattern => 
+                message.toLowerCase().includes(pattern)
+            );
+            
+            const isPasswordError = passwordErrorPatterns.some(pattern => 
+                message.toLowerCase().includes(pattern)
+            );
+            
+            if (isUserNotFound) {
+                console.log('401 - User not found pattern detected, switching to register');
+                showAlert(alertId, 'Account not found. Switching to registration...', 'warning');
+                setTimeout(() => {
+                    autoSwitchToRegister(email, isHeroForm);
+                }, 1500);
+                
+            } else if (isPasswordError) {
+                console.log('401 - Password error detected');
+                showAlert(alertId, 'Incorrect password. Please try again.', 'error');
+                
+            } else {
+                // Generic 401 - could be either, but default to credential error
+                console.log('401 - Generic credential error');
+                showAlert(alertId, 'Invalid email or password. Please check and try again.', 'error');
+            }
+            
+        } else if (status === 400) {
+            // Bad request - could be missing fields or user not found
+            const userNotFoundPatterns = [
+                'user not found',
+                'email not found',
+                'account not found'
+            ];
+            
+            const isUserNotFound = userNotFoundPatterns.some(pattern => 
+                message.toLowerCase().includes(pattern)
+            );
+            
+            if (isUserNotFound) {
+                console.log('400 - User not found, switching to register');
+                showAlert(alertId, 'Account not found. Switching to registration...', 'warning');
+                setTimeout(() => {
+                    autoSwitchToRegister(email, isHeroForm);
+                }, 1500);
+            } else {
+                showAlert(alertId, `Login failed: ${message}`, 'error');
+            }
+            
+        } else {
+            // Other errors (500, etc.)
+            showAlert(alertId, `Login failed: ${message}`, 'error');
+        }
+        
+    } else {
+        // Handle registration errors
+        if (status === 409 || 
+            (status === 400 && (
+                message.toLowerCase().includes('exists') || 
+                message.toLowerCase().includes('already') ||
+                message.toLowerCase().includes('duplicate')
+            ))) {
+            
+            showAlert(alertId, 'Email already registered. Try logging in instead.', 'warning');
+            
+            if (!isHeroForm) {
+                setTimeout(() => {
+                    const switchBtn = document.getElementById('modeToggleBtn');
+                    if (switchBtn) {
+                        switchBtn.style.background = '#f59e0b';
+                        switchBtn.style.animation = 'pulse 1s infinite';
+                        
+                        setTimeout(() => {
+                            switchBtn.style.background = '';
+                            switchBtn.style.animation = '';
+                        }, 3000);
+                    }
+                }, 1000);
+            } else {
+                // For hero form, switch back to login mode
+                setTimeout(() => {
+                    heroMode = 'login';
+                    renderAuthForm(authForm, true);
+                    showAlert('heroAlert', 'Please try logging in with your existing account.', 'info');
+                }, 2000);
+            }
+            
+        } else {
+            showAlert(alertId, `Registration failed: ${message}`, 'error');
+        }
+    }
+}
+
+// Enhanced Alert System
+function showAlert(containerId, message, type = 'error') {
+    console.log('Showing Alert:', { containerId, message, type });
+    
+    let container = document.getElementById(containerId);
+    
+    // If it's heroAlert and doesn't exist, create it dynamically
+    if (containerId === 'heroAlert' && !container) {
+        const heroCard = document.querySelector('.hero-card .card-body');
+        if (heroCard) {
+            container = document.createElement('div');
+            container.id = 'heroAlert';
+            container.className = 'modal-alert';
+            container.style.marginTop = 'var(--space-4)';
+            heroCard.appendChild(container);
+        }
+    }
+    
+    if (!container) {
+        console.error('Alert container not found and could not be created:', containerId);
+        return;
+    }
+    
+    const alertConfig = {
+        success: { icon: '✅', class: 'success' },
+        error: { icon: '❌', class: 'error' },
+        warning: { icon: '⚠️', class: 'warning' },
+        info: { icon: 'ℹ️', class: 'info' }
+    };
+    
+    const config = alertConfig[type] || alertConfig.error;
+    
+    container.className = `modal-alert ${config.class}`;
+    container.innerHTML = `${config.icon} ${message}`;
+    container.style.display = 'block';
+    
+    console.log('Alert displayed:', container.className, container.innerHTML);
+    
+    // Auto-clear success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            clearAlert(containerId);
+        }, 5000);
+    }
+}
+
+function clearAlert(containerId) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.className = 'modal-alert';
+        container.innerHTML = '';
+        container.style.display = 'none';
+    }
+}
+
+// Intersection Observer for animations
+function setupIntersectionObserver() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.feature-card, .stat-item').forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Close mobile menu when clicking nav links
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        navMenu?.classList.remove('active');
+        navToggle?.classList.remove('active');
+    });
+});
+
+// Global functions
+window.openModal = openModal;
+window.closeModal = closeModal;

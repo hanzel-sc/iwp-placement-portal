@@ -56,3 +56,33 @@ This Placement Portal enables:
 
 ---
 
+## How to contribute and collaborate
+
+#### 1. Fork and Clone the repository 
+- Fork the repository 
+- (in the VS Code terminal) git clone https://github.com/your-username/forked-repository.git
+
+#### 2. Take time to understand the project structure
+- E.g say you're working on the frontend for the student module. Navigate to the frontend folder and create a folder for your module -> frontend/student-pages. 
+- css files go into a seperate folder -> frontend/css
+- frontend javascript logic -> frontend/js
+- new backend route -> backend/routes
+
+- Kindly adhere to the project structure. 
+
+### 3. Contributing
+- NEVER PUSH DIRECTLY TO MAIN !
+- in your VS Code terminal type : git checkout -b feature/your-feature e.g. If you're doing the student module : git checkout -b feature/student-module
+- make your changes, contribution, etc
+- add the changes -> git add .
+- Commit the changes -> git commit -m "Your commit message"
+
+- push the changes to your branch -> git push origin feature/your-feature 
+- NEVER PUSH DIRECTLY TO MAIN
+
+### 4. Create aa pull request 
+- Head over to github and create a pull request
+- List the features you've implemented and the files changed. 
+
+
+

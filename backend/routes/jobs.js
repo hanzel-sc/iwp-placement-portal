@@ -120,6 +120,38 @@ router.get('/jobs', authMiddleware, async (req, res) => {
     }
 });
 
+// GET individual job details - ADD THIS ROUTE
+router.get('/:id', async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    
+    const [jobs] = await db.execute(`
+      SELECT jp.*, c.companyName, c.industry 
+      FROM job_postings jp 
+      JOIN companies c ON jp.companyId = c.id 
+      WHERE jp.id = ? AND jp.status = 'active'
+    `, [jobId]);
+    
+    if (jobs.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Job not found' 
+      });
+    }
+    
+    res.json({
+      success: true,
+      job: jobs[0]  // Return job wrapped in object
+    });
+    
+  } catch (error) {
+    console.error('Error fetching job details:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error' 
+    });
+  }
+});
 
 // Update job posting (protected route)
 router.put('/:id', authMiddleware, async (req, res) => {

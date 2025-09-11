@@ -1,7 +1,7 @@
 //backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
-const JWT_SECRET = process.env.JWT_SECRET || 'christ_university_placement_secret_key_2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const authMiddleware = async (req, res, next) => {
     try {

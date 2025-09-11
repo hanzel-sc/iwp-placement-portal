@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Student Profile | Christ University Placement Portal</title>
+  <link rel="stylesheet" href="/css/student-styles.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="https://christuniversity.in/images/logo.png" alt="Christ University"/>
+        <div class="logo-text">Placement Portal</div>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="student-dashboard.html">Dashboard</a></li>
+          <li><a href="student-profile.html" class="active">Profile</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <div class="user-info">
+          <span id="studentName">Loading...</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+  <main class="main-content">
+    <div class="card">
+      <div class="card-header">
+        <h1 class="card-title">My Profile</h1>
+        <p class="card-subtitle">Update your details and upload your latest resume.</p>
+      </div>
+      <div id="alertContainer"></div>
+      <form id="profileForm">
+        <div class="form-group">
+          <label class="form-label" for="firstName">First Name *</label>
+          <input type="text" id="firstName" name="firstName" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="lastName">Last Name *</label>
+          <input type="text" id="lastName" name="lastName" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email *</label>
+          <input type="email" id="email" name="email" class="form-input" required disabled/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone *</label>
+          <input type="tel" id="phone" name="phone" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="course">Course *</label>
+          <select id="course" name="course" class="form-input" required>
+            <option value="">Select</option>
+            <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+            <option value="Electronics and Communication">Electronics and Communication</option>
+            <option value="Mechanical Engineering">Mechanical Engineering</option>
+            <option value="CSE (AIML)">CSE (AIML)</option>
+            <option value="CSE (Data Science)">CSE (Data Science)</option>
+            <option value="Civil Engineering">Civil Engineering</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="year">Year *</label>
+          <select id="year" name="year" class="form-input" required>
+            <option value="">Select</option>
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option>
+            <option value="PG1">PG1</option><option value="PG2">PG2</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cgpa">CGPA *</label>
+          <input type="number" step="0.01" min="0" max="10" id="cgpa" name="cgpa" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="skills">Key Skills</label>
+          <input type="text" id="skills" name="skills" class="form-input" />
+        </div>
+        <div class="form-group">
+  <label class="form-label" for="resume">
+    Resume 
+    <small style="color: #666;">
+      (PDF/DOC/DOCX, Max 2MB)
+    </small>
+  </label>
+  <input 
+    type="file" 
+    id="resume" 
+    name="resume" 
+    class="form-input" 
+    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  />
+  <div id="file-validation" style="margin-top: 0.5rem;"></div>
+  <div id="resumeLink" style="margin-top: 0.5rem;"></div>
+</div>
+
+        <button type="submit" class="btn btn-primary"><span class="btn-text">Update Profile</span>
+          <div class="loading" style="display:none"></div>
+        </button>
+      </form>
+    </div>
+  </main>
+  <script src="/js/student-app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      loadStudentProfile();
+      document.getElementById('profileForm').addEventListener('submit', updateProfile);
+      // Add this to your DOMContentLoaded event listener
+document.addEventListener("DOMContentLoaded", function () {
+  loadStudentProfile();
+  document.getElementById('profileForm').addEventListener('submit', updateProfile);
+  
+  // File input validation with immediate feedback
+  const fileInput = document.getElementById('resume');
+  const fileValidation = document.getElementById('file-validation');
+  
+  if (fileInput && fileValidation) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      
+      if (!file) {
+        fileValidation.innerHTML = '';
+        return;
+      }
+      
+      const maxSizeMB = 2;
+      const fileSizeMB = file.size / (1024 * 1024);
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      
+      // Validate file size
+      if (fileSizeMB > maxSizeMB) {
+        fileValidation.innerHTML = `
+          <div class="alert alert-error" style="animation: shake 0.5s;">
+            🚫 <strong>File Too Large:</strong> "${file.name}" (${fileSizeMB.toFixed(2)}MB) exceeds the ${maxSizeMB}MB limit.
+            <br><small>💡 Please compress your file or choose a smaller one.</small>
+          </div>
+        `;
+        return;
+      }
+      
+      // Validate file type
+      if (!allowedTypes.includes(file.type)) {
+        const ext = file.name.split('.').pop().toUpperCase();
+        fileValidation.innerHTML = `
+          <div class="alert alert-error" style="animation: shake 0.5s;">
+            🚫 <strong>Invalid File Type:</strong> ${ext} files are not supported.
+            <br><small>💡 Please upload PDF, DOC, or DOCX files only.</small>
+          </div>
+        `;
+        return;
+      }
+      
+      // File is valid
+      fileValidation.innerHTML = `
+        <div class="alert alert-success" style="animation: fadeIn 0.3s;">
+          ✅ <strong>File Ready:</strong> "${file.name}" (${fileSizeMB.toFixed(2)}MB)
+          <br><small>💡 Click "Update Profile" to upload your resume.</small>
+        </div>
+      `;
+    });
+  }
+});
+
+
+    });
+  </script>
+</body>
+</html>

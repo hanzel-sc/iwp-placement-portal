@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Student Dashboard | Christ University Placement Portal</title>
+  <link rel="stylesheet" href="/css/student-styles.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="https://christuniversity.in/images/logo.png" alt="Christ University"/>
+        <div class="logo-text">Placement Portal</div>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="student-dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="student-profile.html">Profile</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <div class="user-info">
+          <span id="studentName">Loading...</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+  <main class="main-content">
+    <div class="card">
+      <div class="card-header">
+        <h1 class="card-title">Welcome, <span id="studentWelcome">Student</span></h1>
+        <p class="card-subtitle">Explore campus placements, apply for jobs and track your career.</p>
+      </div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="applicationsCount">0</div>
+        <div class="stat-label">Applications Made</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="offersCount">0</div>
+        <div class="stat-label">Offers Received</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="newJobsCount">0</div>
+        <div class="stat-label">New Jobs Posted</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Current Job Openings</h2>
+      </div>
+      <div id="jobsList" class="listings">
+        <div class="loading"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">My Applications</h2>
+      </div>
+      <div id="applicationsList" class="listings"></div>
+    </div>
+  </main>
+
+  <!-- Job Detail Modal -->
+  <div id="jobModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeJobModal()">&times;</button>
+      <div id="jobModalBody"><div class="loading"></div></div>
+    </div>
+  </div>
+
+  <script src="/js/student-app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      loadStudentProfile();
+      loadStudentDashboard();
+      loadJobOpenings();
+        const modal = document.getElementById('jobModal');
+  const modalContent = modal?.querySelector('.modal-content');
+  
+  if (modal) {
+    // Close modal when clicking backdrop
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        closeJobModal();
+      }
+    });
+  }
+  
+  if (modalContent) {
+    // Prevent modal from closing when clicking inside modal content
+    modalContent.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+  }
+    });
+  </script>
+</body>
+</html>
