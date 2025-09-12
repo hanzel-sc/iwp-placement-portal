@@ -4,11 +4,16 @@
 const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api"
 
 (function() {
-    
-    if (!sessionStorage.getItem('authorized')) {
-        // Always redirect to root (auth page) if not authorized
-        window.location.href = '/';
-        return;
+    if (!sessionStorage.getItem('authenticated')) {
+        const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        
+        if (isVercel) {
+            // On Vercel, redirect to root (splash screen)
+            window.location.href = '/';
+        } else {
+            // Local development, redirect to splash.html
+            window.location.href = 'auth.html';
+        }
     }
 })();
 // State
