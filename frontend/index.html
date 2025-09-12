@@ -11,21 +11,16 @@
     <link rel="stylesheet" href="css/landing.css">
         <script>
         // Authorization check - redirect if not authorized
-        // Enhanced Authorization check - redirect if not authorized
-            (function() {
-                const isAuthorized = sessionStorage.getItem('authorized');
-                const currentPath = window.location.pathname;
-                const isAuthPage = currentPath === '/' || currentPath === '/auth.html';
-                
-                console.log('Auth check:', { isAuthorized, currentPath, isAuthPage });
-                
-                if (!isAuthorized && !isAuthPage) {
-                    // Redirect to auth page if not authorized and not already on auth page
-                    window.location.href = '/';
-                }
-            })();
-        </script>
-
+        if (!sessionStorage.getItem('authorized')) {
+            // For Vercel deployment (splash is index.html)
+            if (window.location.pathname === '/home.html' || window.location.pathname === '/main.html') {
+                window.location.href = '/';
+            }
+            // For local development (splash is splash.html)
+            else if (window.location.pathname === '/index.html' || window.location.pathname === '/') {
+                window.location.href = 'auth.html';
+            }
+        }
     </script>
 </head>
 <body>
