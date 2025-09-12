@@ -4,7 +4,7 @@
 const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api"
 
 (function() {
-    if (!sessionStorage.getItem('authenticated')) {
+    if (!sessionStorage.getItem('authorized')) {
         const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         
         if (isVercel) {
