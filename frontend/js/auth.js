@@ -45,8 +45,9 @@ function createMatrixEffect() {
     setInterval(draw, 35);
 }
 
+createMatrixEffect()
 // Animate ASCII art
-function animateASCII() {
+/*function animateASCII() {
     const asciiElement = document.getElementById('ascii-text');
     const asciiText = asciiElement.textContent;
     asciiElement.textContent = '';
@@ -60,7 +61,7 @@ function animateASCII() {
             clearInterval(interval);
         }
     }, 20);
-}
+}*/
 
 function validateKey() {
     const input = document.getElementById('secretKey').value;
