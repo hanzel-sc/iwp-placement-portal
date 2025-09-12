@@ -10,18 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/landing.css">
         <script>
-        // Authorization check - redirect if not authorized
-        if (!sessionStorage.getItem('authorized')) {
-            // For Vercel deployment (splash is index.html)
-            if (window.location.pathname === '/home.html' || window.location.pathname === '/main.html') {
+            // FIXED: Authorization check with correct logic
+            function checkAuthorization() {
+            const isAuthorized = sessionStorage.getItem('authorized');
+    
+            if (!isAuthorized) {
+                // User is not authorized, redirect to auth page
                 window.location.href = '/';
+                return;
             }
-            // For local development (splash is splash.html)
-            else if (window.location.pathname === '/index.html' || window.location.pathname === '/') {
-                window.location.href = 'auth.html';
-            }
-        }
-    </script>
+    
+            // User is authorized, continue loading the page
+            console.log('User authorized, loading placement portal...');
+        }   
+
+            // Run authorization check immediately
+            checkAuthorization();
+        </script>
 </head>
 <body>
     <!-- Navigation -->

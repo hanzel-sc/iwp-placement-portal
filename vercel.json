@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/fronend/auth.html"
+      "destination": "/frontend/auth.html"
     },
     {
       "source": "/home",
@@ -13,20 +13,16 @@
       "destination": "/frontend/index.html"
     },
     {
-      "source": "/company/company-dashboard.html",
-      "destination": "/frontend/company/company-dashboard.html"
+      "source": "/student/(.*)",
+      "destination": "/frontend/student/$1"
     },
     {
-      "source": "/company/company-profile.html", 
-      "destination": "/frontend/company/company-profile.html"
+      "source": "/faculty/(.*)",
+      "destination": "/frontend/faculty/$1"
     },
     {
-      "source": "/company/create-job.html",
-      "destination": "/frontend/company/create-job.html"
-    },
-    {
-      "source": "/company/view-applications.html",
-      "destination": "/frontend/company/view-applications.html"
+      "source": "/company/(.*)",
+      "destination": "/frontend/company/$1"
     },
     {
       "source": "/js/(.*)",

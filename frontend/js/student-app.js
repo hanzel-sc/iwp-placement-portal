@@ -1,6 +1,6 @@
 // frontend/js/student-app.js
-const API_BASE_URL = 'http://localhost:3000/api';
-//const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api"
+//const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = "https://iwp-placement-portal-production.up.railway.app/api"
 
 // --- Common: Authentication & Logout ---
 // Get the base path for the application

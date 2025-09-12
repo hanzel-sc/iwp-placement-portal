@@ -1,6 +1,7 @@
 // Simple global configuration
-const API_BASE = 'http://localhost:3000/api';
+//const API_BASE = 'http://localhost:3000/api';
 
+const API_BASE = "https://iwp-placement-portal-production.up.railway.app/api"
 // Get the base path for the application
 function getBasePath() {
     const path = window.location.pathname;
