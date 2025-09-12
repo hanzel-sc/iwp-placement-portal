@@ -35,8 +35,8 @@ const corsOptions = {
         'http://127.0.0.1:5500',
         'http://localhost:8080',
         'http://127.0.0.1:8080',
-        // Production origin (your Railway URL)
-        'https://iwp-placement-portal-production.up.railway.app'
+        // Production origin 
+        'https://iwp-placement-portal.vercel.app'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],

@@ -1,29 +1,37 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
-      "destination": "/frontend/auth.html"
+      "destination": "/frontend/auth.html",
+      "permanent": false
     },
     {
       "source": "/home",
-      "destination": "/frontend/index.html"
+      "destination": "/frontend/index.html",
+      "permanent": false
     },
     {
       "source": "/main",
-      "destination": "/frontend/index.html"
+      "destination": "/frontend/index.html",
+      "permanent": false
     },
     {
       "source": "/student/(.*)",
-      "destination": "/frontend/student/$1"
+      "destination": "/frontend/student/$1",
+      "permanent": false
     },
     {
       "source": "/faculty/(.*)",
-      "destination": "/frontend/faculty/$1"
+      "destination": "/frontend/faculty/$1",
+      "permanent": false
     },
     {
       "source": "/company/(.*)",
-      "destination": "/frontend/company/$1"
-    },
+      "destination": "/frontend/company/$1",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
     {
       "source": "/js/(.*)",
       "destination": "/frontend/js/$1"
