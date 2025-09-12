@@ -76,7 +76,7 @@ function validateKey() {
         
         setTimeout(() => {
             // FIXED: Redirect to the correct path for Vercel
-            window.location.href = '/home';
+            window.location.href = '/index.html' || '/home';
         }, 1500);
         
     } else {

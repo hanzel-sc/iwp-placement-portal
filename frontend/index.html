@@ -10,29 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/landing.css">
         <script>
-        // FIXED: Enhanced Authorization check
-        (function() {
-            const isAuthorized = sessionStorage.getItem('authorized');
-            const currentPath = window.location.pathname;
-            
-            console.log('Auth check:', { isAuthorized, currentPath });
-            
-            // Only redirect if not authorized AND not already on auth/splash page
-            if (!isAuthorized && currentPath !== '/' && currentPath !== '/auth.html') {
-                console.log('Not authorized, redirecting to auth');
+        // Authorization check - redirect if not authorized
+        if (!sessionStorage.getItem('authorized')) {
+            // For Vercel deployment (splash is index.html)
+            if (window.location.pathname === '/home.html' || window.location.pathname === '/main.html') {
                 window.location.href = '/';
-                return;
             }
-            
-            // If authorized and on root, redirect to main page
-            if (isAuthorized && (currentPath === '/' || currentPath === '/auth.html')) {
-                console.log('Already authorized, redirecting to main');
-                window.location.href = '/home';
-                return;
+            // For local development (splash is splash.html)
+            else if (window.location.pathname === '/index.html' || window.location.pathname === '/') {
+                window.location.href = 'auth.html';
             }
-        })();
-        </script>
-
+        }
+    </script>
 </head>
 <body>
     <!-- Navigation -->
