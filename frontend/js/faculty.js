@@ -348,18 +348,49 @@ async function loadStudents() {
 
 // View student details
 async function viewStudent(studentId) {
-    try {
-        const data = await api(`/faculty/students/${studentId}`);
-        
-        alert(`Student: ${data.student.firstName} ${data.student.lastName}
-Email: ${data.student.email}
-CGPA: ${data.student.cgpa}
-Applications: ${data.student.totalApplications}
-Offers: ${data.student.totalOffers}`);
-    } catch (error) {
-        showAlert('Failed to load student details', 'error');
+  try {
+    const result = await api(`/faculty/students/${studentId}`);
+    if (!result.success) throw new Error(result.message);
+
+    const student = result.student;
+    document.getElementById('modal-student-name').textContent =
+      `${student.firstName} ${student.lastName}`;
+    document.getElementById('modal-student-email').textContent = student.email;
+    document.getElementById('modal-student-cgpa').textContent = student.cgpa || "N/A";
+    document.getElementById('modal-student-apps').textContent = student.totalApplications;
+    document.getElementById('modal-student-offers').textContent = student.totalOffers;
+
+    // Show application list if desired
+    const appList = result.applications || [];
+    const appListElem = document.getElementById('modal-student-app-list');
+    if (appList.length) {
+      appListElem.innerHTML = "<h4>Applications:</h4>" +
+        appList.map(app =>
+          `<div style="background:#242424;padding:8px;margin-bottom:5px;border-radius:3px;">
+            <strong>${app.jobTitle}</strong> @ ${app.companyName}<br>
+            <small>${new Date(app.appliedAt).toLocaleDateString()}</small>
+          </div>`
+        ).join('');
+    } else {
+      appListElem.innerHTML = "<i>No applications yet.</i>";
     }
+
+    document.getElementById('student-modal').style.display = 'block';
+  } catch (error) {
+    showAlert('Failed to load student details', 'error');
+  }
 }
+
+// Modal close handler
+document.getElementById('close-student-modal').onclick = function() {
+  document.getElementById('student-modal').style.display = 'none';
+};
+
+// Optionally hide modal on outside click
+window.onclick = function(event) {
+  const modal = document.getElementById('student-modal');
+  if (event.target === modal) modal.style.display = 'none';
+};
 
 // ✅ FIXED: Proper event listeners setup
 function setupEventListeners() {
